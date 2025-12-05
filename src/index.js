@@ -12,7 +12,12 @@ async function getSheetValues() {
   if (!rawCreds) throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON is not set");
 
   const credentials = JSON.parse(rawCreds);
-
+  if (credentials.private_key) {
+  credentials.private_key = credentials.private_key
+    .replace(/\\n/g, '\n')        // convert escaped \n
+    .replace(/\r/g, '')           // remove any CR
+    .trim();                      // remove extra spaces
+  }
   const auth = new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"]
