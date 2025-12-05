@@ -1,0 +1,15 @@
+{
+  "name": "yourgpt-google-sheets-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "googleapis": "^135.1.0"
+  }
+}
