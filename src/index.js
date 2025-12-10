@@ -30,7 +30,7 @@ async function getSheetValues() {
   const spreadsheetId =
     process.env.SHEET_ID || "1G5_VZb9I4KLxBXxcqAjkSbAjR8xTZaO4QLUE-uc0yLE";
 
-  const range = process.env.SHEET_RANGE || "Sheet1";
+  const range = process.env.SHEET_RANGE || "orders";
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -69,11 +69,14 @@ app.get("/orders", async (req, res) => {
     const values = await getSheetValues();
     const items = rowsToObjects(values);
 
-    const q = String(req.query.orderId || "").trim();
+    const orderId = String(req.query.orderId || "").trim();
+    const email = String(req.query.email || "").trim().toLowerCase();
 
-    const filtered = q
-      ? items.filter((r) => String(r.order_id || "").trim() === q)
-      : items;
+    const filtered = items.filter((r) => {
+      const byId = orderId ? String(r.order_id || "").trim() === orderId : true;
+      const byEmail = email ? String((r.customer_email || "").trim().toLowerCase()) === email : true;
+      return byId && byEmail;
+    });
 
     res.json({ count: filtered.length, items: filtered });
   } catch (err) {
@@ -132,10 +135,6 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-// const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-// app.listen(port, () => {
-//   console.log(`server listening on http://localhost:${port}`);
-// });
 
 // 🔥 REQUIRED FOR VERCEL — export app, DO NOT LISTEN!
 export default app;
